@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title> mon App Api</title>
+		<style>
+			#demo {
+				font-family: "Helvetica", Arial, sans-serif;
+			}
+			a {
+				text-decoration: none;
+				color: #f66;
+			}
+			li {
+				line-height: 1.5em;
+				margin-bottom: 20px;
+			}
+			.author,
+			.date {
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+    <div id="demo">
+        <h1>Dernière API Vue.js</h1>
+        <template v-for="gouv in gouvs">
+            <input
+                type="array"
+                :id=""
+                :value="item"
+                name="placeholder"
+                v-model="currentGouv"
+            />
+            <label :for="gouv">{{ gouv }}</label>
+        </template>
+        <br />Valeur de currentGouv : {{ currentGouv }}
+        <ul>
+            <li v-for="record in filteredGouv" :key="record.description">
+                <a :href="record.mairie" target="_blank" class="API"
+                    >{{ record.mairie.slice(0, 7) }}</a
+                > -
+                <span class="message">{{ formattedMessage(record.population) }}</span
+                ><br />
+                par
+                <span class="author">
+                    <a :href="record.author.html_url" target="_blank"
+                        >{{ record.zone}}</a
+                    >
+                </span>
+               
+            </li>
+        </ul>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script>
+        const apiURL = "https://geo.api.gouv.fr/definition.yml";
+
+        Vue.createApp({
+            data() {
+                return {
+                    gouvs: [""],
+                    currentBranch: "main",
+                    commits: [],
+                };
+            },
+
+            computed: {
+                filteredCommits() {
+                    return this.array.filter(commit =>
+                        commit.commit.author.name === "Evan You"
+                    );
+                },
+            },
+
+            created() {
+                this.fetchData();
+            },
+
+            watch: {
+                currentBranch: "fetchData",
+            },
+
+            methods: {
+                async fetchData() {
+                    try {
+                        const response = await axios.get(apiURL);
+                    
+                        console.log(response.data);
+                        
+                    } catch (error) {
+                        console.error("Erreur d'appel API");
+                        console.error(error);
+                    }
+                },
+
+                formattedMessage(message) {
+                    const newline = message.indexOf("\n");
+                    console.log(newline);
+                    return newline > 0 ? message.slice(0, newline) : message;
+                },
+
+                formattedDate(date) {
+                    return date.replace(/T|Z/g, " ");
+                },
+            },
+        }).mount("#demo");
+    </script>
+</body>
+
+
+</html>
