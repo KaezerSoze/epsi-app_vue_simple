@@ -23,83 +23,81 @@
 		</style>
 	</head>
 	<body>
-
-        <div id="app">
-          <h1>Dernière API Vue.js</h1>
-          <template v-for="gouv in gouvs">
-            <input
-              type="radio"
-              :id="gouv"
-              :value="gouv"
-              name="placeholder"
-              v-model="currentGouv"
-            />
-            <label :for="gouv">{{ gouv }}</label>
-          </template>
-        
+        <div id="demo">
+          <h1>Les aides financières de l'ADEME</h1>
           <ul>
-            <li v-for="record in filteredGouv" :key="record.description">
-              <a :href="record.mairie" target="_blank" class="API">
-                {{ record.mairie.slice(0, 7) }}
-              </a> -
-              <span class="message">{{ formattedMessage(record.population) }}</span><br />
-              par
-              <span class="author">{{ record.zone }}</span>
+            <li v-for="dataset in datasets" :key="dataset.id">
+              <h2>{{ dataset.title }}</h2>
+              <p>{{ dataset.description }}</p>
+              <img :src="dataset.image" alt="Dataset Image" v-if="dataset.image" />
+              <p>Spatial Coverage: {{ dataset.spatial }}</p>
+              <p v-if="dataset.temporal">Temporal Coverage: {{ dataset.temporal.start }} to {{ dataset.temporal.end }}</p>
+              <p v-if="dataset.keywords && dataset.keywords.length > 0">Keywords: {{ dataset.keywords.join(', ') }}</p>
+              <p v-if="dataset.frequency">Update Frequency: {{ dataset.frequency }}</p>
+              <a :href="dataset.page" target="_blank">View Dataset</a>
+      
+              <div v-if="dataset.file">
+                <h3>File Details</h3>
+                <p>Name: {{ dataset.file.name }}</p>
+                <p>Size: {{ dataset.file.size }}</p>
+                <p>Encoding: {{ dataset.file.encoding }}</p>
+                <p>Mime Type: {{ dataset.file.mimetype }}</p>
+               
+              </div>
+      
+              <div v-if="dataset.originalFile">
+                <h3>Original File Details</h3>
+                <p>Name: {{ dataset.originalFile.name }}</p>
+                <p>Size: {{ dataset.originalFile.size }}</p>
+                <p>Mime Type: {{ dataset.originalFile.mimetype }}</p>
+             
+              </div>
+      
+              <div v-if="dataset.attachments && dataset.attachments.length > 0">
+                <h3>Attachments</h3>
+                <ul>
+                  <li v-for="attachment in dataset.attachments" :key="attachment.title">
+                    <p>Title: {{ attachment.title }}</p>
+                    <p>Description: {{ attachment.description }}</p>
+                    <p>Type: {{ attachment.type }}</p>
+                    
+                  </li>
+                </ul>
+              </div>
+      
+              <div v-if="dataset.remoteFile">
+                <h3>Remote File Details</h3>
+                <p>Name: {{ dataset.remoteFile.name }}</p>
+                <p>Size: {{ dataset.remoteFile.size }}</p>
+                
+              </div>
             </li>
           </ul>
         </div>
-        
+      
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/vue@3"></script>
         <script>
-          const apiURL = "https://geo.api.gouv.fr/definition.yml";
-        
+          const apiURL = "https://data.ademe.fr/data-fair/api/v1/datasets/les-aides-financieres-de-l'ademe/api-docs.json";
+      
           Vue.createApp({
             data() {
               return {
-                gouvs: ["communes", "epci", "departement", "region"],
-                currentGouv: "communes",
-                data: [],
+                datasets: [],
               };
             },
-        
-            computed: {
-              filteredGouv() {
-                return this.data[this.currentGouv] || [];
-              },
+      
+            async created() {
+              try {
+                const response = await axios.get(apiURL);
+                this.datasets = response.data.components.schemas.datasetSchema.properties;
+              } catch (error) {
+                console.error("Erreur d'appel API");
+                console.error(error);
+              }
             },
-        
-            created() {
-              this.fetchData();
-            },
-        
-            watch: {
-              currentGouv: "fetchData",
-            },
-        
-            methods: {
-              async fetchData() {
-                try {
-                  const response = await axios.get(apiURL);
-                  const yamlData = response.data;
-        
-                  // Mettez à jour this.data avec les données YAML
-        
-                } catch (error) {
-                  console.error("Erreur d'appel API");
-                  console.error(error);
-                }
-              },
-        
-              formattedMessage(message) {
-                const newline = message.indexOf("\n");
-                return newline > 0 ? message.slice(0, newline) : message;
-              },
-            },
-          }).mount("#app");
+          }).mount("#demo");
         </script>
-        
-        </body>
-    
-
+      </body>
+      
 </html>
