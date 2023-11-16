@@ -23,89 +23,83 @@
 		</style>
 	</head>
 	<body>
-        <div id="demo">
-            <h1>Dernière API Vue.js</h1>
-            <template v-for="gouv in gouvs">
-                <input
-                    type="array"
-                    :id="gouv"
-                    :value="gouv"
-                    name="placeholder"
-                    v-model="currentGouv"
-                />
-                <label :for="gouv">{{ gouv }}</label>
-            </template>
-            <br />Valeur de currentGouv : {{ currentGouv }}
-            <ul>
-                <li v-for="record in filteredGouv" :key="record.description">
-                    <a :href="record.mairie" target="_blank" class="API"
-                        >{{ record.mairie.slice(0, 7) }}</a
-                    > -
-                    <span class="message">{{ formattedMessage(record.population) }}</span
-                    ><br />
-                    par
-                    <span class="author">
-                        {{ record.zone }}
-                    </span>
-                </li>
-            </ul>
+
+        <div id="app">
+          <h1>Dernière API Vue.js</h1>
+          <template v-for="gouv in gouvs">
+            <input
+              type="radio"
+              :id="gouv"
+              :value="gouv"
+              name="placeholder"
+              v-model="currentGouv"
+            />
+            <label :for="gouv">{{ gouv }}</label>
+          </template>
+        
+          <ul>
+            <li v-for="record in filteredGouv" :key="record.description">
+              <a :href="record.mairie" target="_blank" class="API">
+                {{ record.mairie.slice(0, 7) }}
+              </a> -
+              <span class="message">{{ formattedMessage(record.population) }}</span><br />
+              par
+              <span class="author">{{ record.zone }}</span>
+            </li>
+          </ul>
         </div>
+        
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/vue@3"></script>
         <script>
-            const apiURL = "https://geo.api.gouv.fr/definition.yml";
-    
-            Vue.createApp({
-                data() {
-                    return {
-                        gouvs: ["communes", "epci", "departement", "region"], 
-                        currentGouv: "communes", 
-                        data: [],
-                    };
-                },
-    
-                computed: {
-                    filteredGouv() {
-                     
-                        return this.data[this.currentGouv] || [];
-                    },
-                },
-    
-                created() {
-                    this.fetchData();
-                },
-    
-                watch: {
-                    currentGouv: "fetchData",
-                },
-    
-                methods: {
-                    async fetchData() {
-                        try {
-                            const response = await axios.get(apiURL);
-                            const yamlData = response.data;
-                            const parsedData = jsyaml.load(yamlData);
-    
-                         
-                            console.log(parsedData);
-    
-                            
-                            this.data = parsedData;
-                        } catch (error) {
-                            console.error("Erreur d'appel API");
-                            console.error(error);
-                        }
-                    },
-    
-                    formattedMessage(message) {
-                        const newline = message.indexOf("\n");
-                        console.log(newline);
-                        return newline > 0 ? message.slice(0, newline) : message;
-                    },
-                },
-            }).mount("#demo");
+          const apiURL = "https://geo.api.gouv.fr/definition.yml";
+        
+          Vue.createApp({
+            data() {
+              return {
+                gouvs: ["communes", "epci", "departement", "region"],
+                currentGouv: "communes",
+                data: [],
+              };
+            },
+        
+            computed: {
+              filteredGouv() {
+                return this.data[this.currentGouv] || [];
+              },
+            },
+        
+            created() {
+              this.fetchData();
+            },
+        
+            watch: {
+              currentGouv: "fetchData",
+            },
+        
+            methods: {
+              async fetchData() {
+                try {
+                  const response = await axios.get(apiURL);
+                  const yamlData = response.data;
+        
+                  // Mettez à jour this.data avec les données YAML
+        
+                } catch (error) {
+                  console.error("Erreur d'appel API");
+                  console.error(error);
+                }
+              },
+        
+              formattedMessage(message) {
+                const newline = message.indexOf("\n");
+                return newline > 0 ? message.slice(0, newline) : message;
+              },
+            },
+          }).mount("#app");
         </script>
-    </body>
+        
+        </body>
     
 
 </html>
